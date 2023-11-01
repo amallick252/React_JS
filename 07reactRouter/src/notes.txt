@@ -1,0 +1,112 @@
+npm i
+npm install react-router-dom //for installing router dom
+create Header, footer Home in separate folders, copy from hitesh react 
+Note: link needs to be imported from react router dom if it is used somewhere
+Header (Nav link)> className={({isActive}) => `block py-2 pr-4 pl-3 duration-200 ${isActive?'text-orange-700': 'text-gray-700'} `}// make sure to add space after {isActive}
+add to ="/about" in Navlink to let it know which one is isActive
+--------------------------
+create Layout.jsx
+import {outlet} from 'react-router-dom
+
+<Header/>
+<Outlet/>
+<Footer/>
+
+--------------------------
+import {RouterProvider} from 'react-router-dom'
+
+const router= createBrowserRouter([ // use createBrowserRouter method to use router, it takes an array with objects
+    {
+        path:'/',
+        element: <Layout/>,
+        children: [ // add items inside /, ie: home, About us etc these will take path & elements 
+            { path: "", element: <Home/>}, {path: "/", element: <About/>} // pages needs to be added inside header once created also add to ="/about" in heder to make it isactive
+        ]
+    }
+    
+    
+    ])
+
+render <RouterPovider router ={router}/> in main.jxs it takes a prop to work
+
+Note: for each page you need to add the page, add it to path in main & Add it to the header with to ="/about" in Navlink|||
+path, in the main.jsx('contact-us') and path in  the header (to ='/contact-us') must match to avoid bugs
+
+
+------------------------
+Another Way of creting browser router
+
+const router = createBrowserRouter(
+    createRoutesFromElements(
+        <Route path='/' element = {<Layout/>}> 
+            <Route ='' element = {<Home/>}>
+            <Route ='about' element ={<About/>}>
+            <Route path= 'contact-us' element = {<Contact/>}/>
+            <Route path= 'user/:userid' element ={<User/>}/>       
+        </Route>
+
+    )
+)
+-------------- Adding users Dynamically (UseParam)-----------------
+Note: dont put any space in path= 'user/:userid' in main.jsx
+<Route path = 'user/:userid' element = {<User/>}/>
+
+in User file
+
+import {UseParams} from 'react-router-dom'
+
+in function
+const {userid}= useParams()
+
+now you can use the param anywhere as {userid}
+<div>user is {userid}<div/>
+
+Note: when the parama link changes in the address like user/Anything, it will render "Anything" where {useid} is used in the html
+---------------Adding Followers through use effect-------------------
+import React, { useState, useEffect } from 'react'
+import { useLoaderData } from 'react-router-dom'
+
+function Github() {
+    const data = useLoaderData()
+    // const [data, setData] = useState({})
+
+    // useEffect(()=>{
+    //  fetch(`https://api.github.com/users/amallick252`)
+    // .then(res=> res.json())
+    // .then(res => {setData(res);
+    // console.log(data)
+    // })
+    
+    // }, [])
+    
+  return (
+    <div className='bg-slate-600 text-3xl text-white p-2'>Github Followers: {data.followers}
+    <img className = 'w-96' src={data.avatar_url} alt="Abinash"></img>
+    </div>
+    
+  )
+}
+
+export default Github
+---------------Adding Api loader-------------------
+->in Github file<-
+import import { useLoaderData } from 'react-router-dom'
+
+const data = useLoaderData()
+
+export const githubInfoLoder = async ()=>{
+    const responce = await fetch(`https://api.github.com/users/amallick252`)
+    return responce.json()
+}
+// comment out others
+
+->in main.jsx file<-
+
+add loder ={GithubInfoLoader}
+
+<Route loader={GithubInfoLoader} path= 'github' element ={<Github/>}/>
+
+on mouse hover it will load data and show when clicked
+
+
+

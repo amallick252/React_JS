@@ -1,0 +1,55 @@
+create a new file in a folder UserContext.js in context
+> create a context> const UserContext = React.createContext()
+-----------
+create UserContextProvider.jsx in context
+import UserContext, 
+UserContextProvider function will take take {x} as prop and pass it context value of 
+created states (value ={user,setUser}), by wrapping {x} with <UserContext.Provider>
+
+import React, { useState } from 'react'
+import UserContext from './UserContext'
+
+const UserContextProvider= ({children})=>{
+    const[user, setUser]= React.useState(null)
+    return(
+        <UserContext.Provider value = {{user,setUser}}>
+            {children}
+        </UserContext.Provider>
+    )
+}
+
+export default UserContextProvider
+--------------
+Login.jsx
+const {setUser}= useContext(UserContext)// This is  destructuring & extracting setUser from UserContext
+    const handleSubmit = (e)=>{
+        e.preventDefault()
+        setUser({username,password})// provideing username & password to setUser
+
+    }
+  return (
+    <div>
+        <input type="text" placeholder='username' value={username} onChange={(e)=> setUsername(e.target.value)} />
+        <input type="text" placeholder='password' value={password} onChange={(e)=> setPassword(e.target.value)} />
+        <button type= 'submit' onClick={handleSubmit}></button>
+    </div>
+
+  )
+--------------
+Profile.jsx
+
+import React, {useContext} from 'react'
+import UserContext from '../context/UserContext'
+
+function Profile() {
+ const {user} = useContext(UserContext)// extracting {user} from useContext
+
+ if(!user) return <div>Please Login!</div>
+ 
+ return <div>Welcome{user.username}</div>
+
+}
+
+export default Profile
+---------------
+

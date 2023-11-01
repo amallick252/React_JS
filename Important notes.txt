@@ -1,0 +1,60 @@
+Virtual dom:The Virtual DOM is a concept in React that represents a 
+lightweight copy of the actual DOM (Document Object Model) in memory.
+
+Fiber:Improves its ability to handle asynchronous operations and prioritize 
+rendering updates. With Fiber, React can pause and resume work on rendering updates
+
+reconsiliation: Reconciliation is the process by which React updates 
+the actual DOM based on the changes identified in the Virtual DOM.
+
+Hydaration: In React, "hydration" refers to the process of attaching JavaScript event
+listeners to a rendered HTML markup that was initially generated on the server side
+
+CRA/Vit: created a new jsx file in src folder, function name should start with uppercase first latter 
+vit/create react app: component(exported func name should be capitalized first letter)
+Good practice keep the file name with capitalized first letter
+
+function Card({username = 'dummy user', btnText = 'btn'}) >if butten text is not available on the card, but will be used as default value of the component
+You can also use {btnText || 'btn'}, in the <button> element text, in the card
+eg: <button className="mt-2 inline-flex cursor-pointer items-center text-sm font-semibold text-black">
+{btnText || 'btn'} →</button>
+
+multiple setCounter(counter + 1) increases just by 1 in default (same counter is getting updated again and again, so it makes a batch for it and runs at a time)
+in order to run this by adding multiple use a call back function instead, this prev counter gives last updated state of the counter and ads one
+eg:
+setCounter((prevcounter)=> counter + 1)
+setCounter((prevcounter)=> counter + 1).......
+
+//tailwind css className
+w-full> width full(w-1/2, w-3/5)
+h-screen> the entire height of the viewport 
+duration-500>transition-duration: 500ms
+fixed >position: fixed;
+flex > Utilities for controlling how flex items both grow and shrink.
+flex-wrap> to allow flex items to wrap to the next line when they overflow the flex container
+justify-center> to justify items along the center of the container’s main axis 
+bottom-12> bottom: 12px;
+inset-x-0> left: 0px; right: 0px;
+px-2> padding-left: 2px; padding-right: 2px;
+gap-3 > Setting the gap between elements 3px
+shadow-lg > shadow large, || shadow-sm, shadow, shadow-md, shadow-lg, shadow-xl, or shadow-2xl
+bg-white > backgroundColor wite
+rounded-3xl > for controlling the border radius of an element
+
+Memoization> in React refers to a performance optimization technique 
+that involves caching the results of expensive function calls and 
+reusing those cached results when the same function is called with 
+the same arguments again.
+
+useMemo> is for memoizing values, while useCallback> is for memoizing functions
+useEffect> use when you need to manage side effects or perform operations
+that aren't directly related to rendering but are essential 
+
+// two type of components
+1 functional component
+2 class component
+3] Higher-Order Components. ...
+4] Dumb Components. ...
+5] Smart Components. ...
+6] Presentational Components. ...
+7] Container components.
