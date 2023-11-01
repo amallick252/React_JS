@@ -1,0 +1,16 @@
+> install @reduxjs/toolkit, @tinymce/tinymce-react, appwrite, html-react-parser, react, react-dom, react-hook-form, react-redux, react-router-dom
+> create .env file in src, add it to gitignore, add VITE_APPWRITE_URL, VITE_APPWRITE_PROJECT_ID, VITE_APPWRITE_DATABASE_ID, VITE_APPWRITE_COLLECTION_ID, VITE_APPWRITE_BUCKET_ID
+> create conf/conf.js in src, add
+const conf={
+    apperiteURL: String(import.meta.env.VITE_APPWRITE_URL),
+    apperiteProjectId: String(import.meta.env.VITE_PROJECT_ID),
+    apperiteDatabaseId: String(import.meta.env.VITE_APPWRITE_DATABASE_ID),
+    apperiteCollectionId: String(import.meta.env.VITE_APPWRITE_COLLECTION_ID),
+    apperiteBucketId: String(import.meta.env.VITE_APPWRITE_BUCKET_ID),
+
+}
+
+export default conf
+-----------------------------
+> create appwrite/auth.js (this will have services, for easier migration from DB)
+>import conf from conf.js
