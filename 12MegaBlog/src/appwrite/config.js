@@ -1,85 +1,3 @@
-> install @reduxjs/toolkit, @tinymce/tinymce-react, appwrite, html-react-parser, react, react-dom, react-hook-form, react-redux, react-router-dom, 
-> create .env file in src, add it to gitignore, add VITE_APPWRITE_URL, VITE_APPWRITE_PROJECT_ID, VITE_APPWRITE_DATABASE_ID, VITE_APPWRITE_COLLECTION_ID, VITE_APPWRITE_BUCKET_ID
-> create conf/conf.js in src, add
-const conf={
-    apperiteURL: String(import.meta.env.VITE_APPWRITE_URL),
-    apperiteProjectId: String(import.meta.env.VITE_PROJECT_ID),
-    apperiteDatabaseId: String(import.meta.env.VITE_APPWRITE_DATABASE_ID),
-    apperiteCollectionId: String(import.meta.env.VITE_APPWRITE_COLLECTION_ID),
-    apperiteBucketId: String(import.meta.env.VITE_APPWRITE_BUCKET_ID),
-
-}
-
-export default conf
------------------------------
-> create appwrite/auth.js (this will have services, for easier migration from DB)
-> import conf from conf.js
-> create classes, constructer, async await functions for createAccount, login, logout, getcurrentuser
-
-import { Client, Account, ID } from "appwrite";
-import conf from "../conf/conf.js";
-
-export class AuthService{
-    client = new Client();// client is not a variable, but a property of instance of AuthService
-    account;// not providing new Account, as we have to first set the end point, setProject|| we are not creating sets in the client here, because it will take up a lot of memory from begining, we want when a new authService is made we have to do the sets 
-
-    constructor(){
-        this.client
-            .setEndpoint(conf.apperiteURL)
-            .setProject(conf.apperiteProjectId);
-        this.account = new Account(this.client);
-    }
-
-    async createAccount({email, password, name}){
-        try {
-            const userAccount = await this.account.create(ID.unique(),email,password,name)
-            if(userAccount){
-                //call another method(directly log the user in)
-                return this.login({email,password});
-            }else{
-                return userAccount;
-            }
-            
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async login({email,password}){
-        try {
-            return await this.account.createEmailSession(email,password);
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async getCurrentUser(){
-        try {
-            return await this.account.get(); 
-        } catch (error) {
-            console.log("Appwrite service:: getCurrentUser::error", error);
-        }
-
-        return null;
-    }
-
-    async logout(){
-        try {
-            await this.account.deleteSessions();
-        } catch (error) {
-            throw error;
-        }
-    }
-}
-
-const authService = new AuthService()// creating an object for user where user can use the constructer and methods
-export default authService
-
-------------------------------
-> create appwrite/config.js
-> import conf from conf.js
-> create classes, constructer, async await functions for createPost, delete, update, getPost/s, upload/deleteFile, getFilePreview
-
 import { Client, ID, Databases, Storage, Query } from "appwrite";
 import conf from "../conf/conf.js";
 
@@ -210,7 +128,5 @@ export class Service{
 }
 
 const service = new Service()
+
 export default service
-
-------------------------------
-
