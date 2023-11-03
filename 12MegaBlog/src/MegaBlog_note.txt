@@ -213,4 +213,9 @@ const service = new Service()
 export default service
 
 ------------------------------
+>create src/store/store.js //store(@reduxjs)
+>create src/store/authSlics.js //State slice for asking store if user is loggedin or not
+(@reduxjs) it will requir intial state, then name, initial state, reducers
+
+> 
 
