@@ -219,3 +219,13 @@ export default service
 
 > 
 
+
+making componets
+Header, footer, index.js
+Container, LogoutBtn, Logo
+button, Input, 
+Vid_23_Select, PostCard, Login, Signup
+
+issues to resolve in PostCard.jsx: import appwriteService instead of service 
+(there is another component which imports config that might have import bugs)
+
