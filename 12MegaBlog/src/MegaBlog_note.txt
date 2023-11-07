@@ -224,7 +224,8 @@ making componets
 Header, footer, index.js
 Container, LogoutBtn, Logo
 button, Input, 
-Vid_23_Select, PostCard, Login, Signup
+Vid_23_Select, PostCard, Login, Signup, AuthLayout(protected container)
+Vid_24_RTE, PostForm, 
 
 issues to resolve in PostCard.jsx: import appwriteService instead of service 
 (there is another component which imports config that might have import bugs)
