@@ -58,3 +58,33 @@ that aren't directly related to rendering but are essential
 5] Smart Components. ...
 6] Presentational Components. ...
 7] Container components.
+
+How router works------
+1. import outlet and return <outlet/> within fixed components eg 
+export default App ()=>
+return (
+<div>
+    <Header/>
+    <Outlet/>
+    <Footer />
+</div>
+)
+
+2. Import App to main, import createBrowserRouter, RouterProvider from react-router-dom
+
+const route = createBrowserRouter([ // routes will be Array of objects
+    path:'/',
+    element:<App/> //note the first element needs to be the layout where the outlet is provided
+    children:[
+        {
+            path:'/',
+            element:<Home/>
+        },
+        {
+            path:'/About',
+            element:<About/>
+        }
+    ]
+])
+
+

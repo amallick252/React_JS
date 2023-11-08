@@ -68,13 +68,13 @@ const Signup = () => {
                 },
               })}
             />
-            <input
+            <Input
               label="password"
               type="password"
               placeholder="Ener your password"
               {...register("password", { required: true })}
             />
-            <Button type="submit" className="w-full"></Button>
+            <Button type="submit" className="w-full">Creat Account</Button>
           </div>
         </form>
       </div>

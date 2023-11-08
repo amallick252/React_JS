@@ -1,0 +1,969 @@
+>>>.env :
+VITE_APPWRITE_URL="https://cloud.appwrite.io/v1"
+VITE_APPWRITE_PROJECT_ID="653bc226ec2f4bb801cd"
+VITE_APPWRITE_DATABASE_ID="653bc3909e45700d9aa3"
+VITE_APPWRITE_COLLECTION_ID="653bc4fcc984803075df"
+VITE_APPWRITE_BUCKET_ID="653bc8d5c0a3263b5162"
+
+>>>conf/conf.js:
+const conf={
+    apperiteURL: String(import.meta.env.VITE_APPWRITE_URL),
+    apperiteProjectId: String(import.meta.env.VITE_APPWRITE_PROJECT_ID),
+    apperiteDatabaseId: String(import.meta.env.VITE_APPWRITE_DATABASE_ID),
+    apperiteCollectionId: String(import.meta.env.VITE_APPWRITE_COLLECTION_ID),
+    apperiteBucketId: String(import.meta.env.VITE_APPWRITE_BUCKET_ID),
+
+}
+
+export default conf
+
+>>>appwrite/auth.js:
+
+const conf={
+    apperiteURL: String(import.meta.env.VITE_APPWRITE_URL),
+    apperiteProjectId: String(import.meta.env.VITE_APPWRITE_PROJECT_ID),
+    apperiteDatabaseId: String(import.meta.env.VITE_APPWRITE_DATABASE_ID),
+    apperiteCollectionId: String(import.meta.env.VITE_APPWRITE_COLLECTION_ID),
+    apperiteBucketId: String(import.meta.env.VITE_APPWRITE_BUCKET_ID),
+
+}
+
+export default conf
+
+>>>appwrite/config.js:
+
+import { Client, ID, Databases, Storage, Query } from "appwrite";
+import conf from "../conf/conf.js";
+
+export class Service{
+    client = new Client();
+    databases;
+    bucket;
+
+    constructor(){
+        this.client
+            .setEndpoint(conf.apperiteURL)
+            .setProject(conf.apperiteProjectId);
+        this.databases = new Databases(this.client);
+        this.bucket = new Storage(this.client)
+    }
+
+    async createPost({title, slug, content, featuredImage, status, userId}){
+        try {
+            await this.databases.createDocument(
+                conf.apperiteDatabaseId,
+                conf.apperiteCollectionId,
+                slug,
+                {
+                    title,
+                    content,
+                    featuredImage,
+                    status,
+                    userId
+                }
+            )
+        } catch (error) {
+            console.log("Appwrite serive :: createPost :: error", error);
+        }
+    }
+
+    async updatePost(slug,{title, content, featuredImage,status}){// user id will be directly provided from post
+        try {
+            return await this.databases.updateDocument(
+                conf.apperiteDatabaseId,
+                conf.apperiteCollectionId,
+                slug,
+                {
+                    title,
+                    content,
+                    featuredImage,
+                    status
+                }
+            )
+        } catch (error) {
+            console.log("Appwrite serive :: updatePost :: error", error);   
+        }
+    }
+
+    async deletePost(slug){
+        try {
+            await this.databases.deleteDocument(
+                conf.apperiteDatabaseId,
+                conf.apperiteCollectionId,
+                slug
+            )
+            return true
+        } catch (error) {
+            console.log("Appwrite serive :: deletePost :: error", error);
+            return false
+        }
+    }
+
+    async getPost(slug){
+        try {
+            return await this.databases.getDocument(
+                conf.apperiteDatabaseId,
+                conf.apperiteCollectionId,
+                slug
+            )
+        } catch (error) {
+            console.log("Appwrite serive :: getPost :: error", error);
+            return false
+        }
+    }
+
+    async getPosts(queries = [Query.equal("status","active" )]){
+        try {
+            return await this.databases.listDocuments(
+                conf.apperiteDatabaseId,
+                conf.apperiteCollectionId,
+                queries
+            )
+        } catch (error) {
+            console.log("Appwrite serive :: getPosts :: error", error);
+            return false 
+        }
+    }
+
+    //File upload services
+
+    async uploadFile(file){
+        try {
+            return await this.bucket.createFile(
+                conf.apperiteBucketId,
+                ID.unique(),
+                file
+            )
+        } catch (error) {
+            console.log("Appwrite serive :: uploadFile :: error", error);
+            return false 
+        }
+    }
+
+    async deleteFile(fileId){
+        try {
+            await this.bucket.deleteFile(
+                conf.apperiteBucketId,
+                fileId
+            )
+            return true
+        } catch (error) {
+            console.log("Appwrite serive :: deleteFile :: error", error);
+            return false
+        }
+    }
+
+    getFilePreview(fileId){
+        return this.bucket.getFilePreview(
+            conf.apperiteBucketId,
+            fileId
+        )
+    }
+}
+
+const service = new Service()
+
+export default service
+
+>>>components/container/container.jsx:
+
+import React from "react";
+
+const Container = ({ children }) => {
+  return <div className="w-full max-w-7xl mx-auto px-4">{children}</div>;
+};
+
+export default Container;
+
+>>>components/Footer/Footer.jsx:
+
+import React from "react";
+import { Link } from "react-router-dom";
+import Logo from "../Logo";
+
+const Footer = () => {
+  return (
+    <section className="relative overflow-hidden py-10 bg-gray-400 border border-t-2 border-t-black">
+      <div className="relative z-10 mx-auto max-w-7xl px-4">
+        <div className="-m-6 flex flex-wrap">
+          <div className="w-full p-6 md:w-1/2 lg:w-5/12">
+            <div className="flex h-full flex-col justify-between">
+              <div className="mb-4 inline-flex items-center">
+                <Logo width="100px" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">
+                  &copy; Copyright 2023. All Rights Reserved by DevUI.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="w-full p-6 md:w-1/2 lg:w-2/12">
+            <div className="h-full">
+              <h3 className="tracking-px mb-9  text-xs font-semibold uppercase text-gray-500">
+                Company
+              </h3>
+              <ul>
+                <li className="mb-4">
+                  <Link
+                    className=" text-base font-medium text-gray-900 hover:text-gray-700"
+                    to="/"
+                  >
+                    Features
+                  </Link>
+                </li>
+                <li className="mb-4">
+                  <Link
+                    className=" text-base font-medium text-gray-900 hover:text-gray-700"
+                    to="/"
+                  >
+                    Pricing
+                  </Link>
+                </li>
+                <li className="mb-4">
+                  <Link
+                    className=" text-base font-medium text-gray-900 hover:text-gray-700"
+                    to="/"
+                  >
+                    Affiliate Program
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className=" text-base font-medium text-gray-900 hover:text-gray-700"
+                    to="/"
+                  >
+                    Press Kit
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="w-full p-6 md:w-1/2 lg:w-2/12">
+            <div className="h-full">
+              <h3 className="tracking-px mb-9  text-xs font-semibold uppercase text-gray-500">
+                Support
+              </h3>
+              <ul>
+                <li className="mb-4">
+                  <Link
+                    className=" text-base font-medium text-gray-900 hover:text-gray-700"
+                    to="/"
+                  >
+                    Account
+                  </Link>
+                </li>
+                <li className="mb-4">
+                  <Link
+                    className=" text-base font-medium text-gray-900 hover:text-gray-700"
+                    to="/"
+                  >
+                    Help
+                  </Link>
+                </li>
+                <li className="mb-4">
+                  <Link
+                    className=" text-base font-medium text-gray-900 hover:text-gray-700"
+                    to="/"
+                  >
+                    Contact Us
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className=" text-base font-medium text-gray-900 hover:text-gray-700"
+                    to="/"
+                  >
+                    Customer Support
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="w-full p-6 md:w-1/2 lg:w-3/12">
+            <div className="h-full">
+              <h3 className="tracking-px mb-9  text-xs font-semibold uppercase text-gray-500">
+                Legals
+              </h3>
+              <ul>
+                <li className="mb-4">
+                  <Link
+                    className=" text-base font-medium text-gray-900 hover:text-gray-700"
+                    to="/"
+                  >
+                    Terms &amp; Conditions
+                  </Link>
+                </li>
+                <li className="mb-4">
+                  <Link
+                    className=" text-base font-medium text-gray-900 hover:text-gray-700"
+                    to="/"
+                  >
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className=" text-base font-medium text-gray-900 hover:text-gray-700"
+                    to="/"
+                  >
+                    Licensing
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Footer;
+
+>>>components/Header/Header.jsx:
+import React from "react";
+import { Container, LogoutBtn, Logo } from "../index";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
+const Header = () => {
+  const authStatus = useSelector((state) => state.auth.status);
+  const navigate = useNavigate();
+
+  const navItem = [
+    {
+      name: "Home",
+      slug: "/",
+      active: true,
+    },
+    {
+      name: "Login",
+      slug: "/login",
+      active: !authStatus,
+    },
+    {
+      name: "Signup",
+      slug: "/signup",
+      active: !authStatus,
+    },
+    {
+      name: "All Posts",
+      slug: "/all-posts",
+      active: authStatus,
+    },
+    {
+      name: "Add Post",
+      slug: "/add-post",
+      active: authStatus,
+    },
+  ];
+
+  return (
+    <header className="py-3 shadow bg-gray-500">
+      <Container>
+        <nav className="flex">
+          <div className="m-4">
+            <Link to="/">
+              <Logo width="70px" />
+            </Link>
+          </div>
+          <ul className="flex ml-auto">
+            {navItem.map((item) =>
+              item.active ? (
+                <li key={item.name}>
+                  <button
+                    onClick={() => navigate(item.slug)}
+                    className="inline-bock px-6 py-2 duration-200 hover:bg-blue-100 rounded-full"
+                  >
+                    {item.name}
+                  </button>
+                </li>
+              ) : null
+            )}
+            {authStatus && (// if authStatus available then render LogoutBtn
+              <li><LogoutBtn/></li>
+            )}
+          </ul>
+        </nav>
+      </Container>
+    </header>
+  );
+};
+
+export default Header;
+
+>>>components/Header/LogoutBtn.jsx:
+
+import React from 'react'
+import {useDispatch} from 'react-redux'
+import authService from '../../appwrite/auth'
+import {logout} from '../../store/authSlice'
+
+const LogoutBtn = () => {
+    const dispatch = useDispatch()
+    const logoutHandler = ()=>{
+        authService.logout().then(()=>{// first log out then update the store state using dispatch
+            dispatch(logout())
+        })
+    }
+  return (
+    <button className="inline-block px-6 py-2 duration-200 hover:bg-blue-100 rounded-full"
+    onClick={logoutHandler}
+    >Logout</button>
+  )
+}
+
+export default LogoutBtn
+
+>>>components/post-form/PostForm.jsx:
+
+import React, {useCallback, useEffect} from 'react'
+import {useForm} from 'react-hook-form'
+import {Button, Input, Select, RTE} from '../index'
+import appwriteService from "../../appwrite/config"
+import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+
+const PostForm = ({post}) => {
+    const {register, handleSubmit, watch, setValue, control, getValues} = useForm({
+        defaultValues:{
+            title: post?.title|| "",
+            slug: post?.slug || "",
+            content: post?.content ||"",
+            status: post?.status || "active",
+        },
+    })
+
+    const navigate = useNavigate()
+    const userData = useSelector(state=> state.auth.userData)
+
+    const submit = async(data)=> {
+        if(post){//RHF accepts data frokm forms
+            const file = data.image[0]? appwriteService.uploadFile(data.image[0]): null // upload image // why we using data.image instead of image id?
+            
+            if(file){
+                appwriteService.deleteFile(post.featuredImage)// delete the old file
+            }
+
+            const dbPost = await appwriteService.updatePost(post.$id,{...data, featuredImage: file? file.$id : undefined})// updatepost requir- slug, other data spread, and overwrite featuredImage
+            if(dbPost){
+                navigate(`/post/${dbPost.$id}`)// navigate to post link
+            }
+        }else{
+            const file = await appwriteService.uploadFile(data.image[0])
+            if(file){
+                const fileId= file.$id
+                data.featuredImage = fileId
+                const dbPost = await appwriteService.createPost({ ...data, userId: userData.$id})
+                if(dbPost){
+                    navigate(`/post/${dbPost.$id}`)
+                }
+            }
+        }
+
+    }
+
+    const slugTransform = useCallback(value =>{// if else
+        if(value && typeof value=== "string"){// type of needs to be checked
+            return value.trim().toLowerCase()
+            .replace(/[^a-zA-Z\d\s]+/g, "-")//
+            .replace(/\s/g, "-");//
+        }
+
+        return "";
+    }, [])
+
+    useEffect(()=>{
+        const subscription = watch((value,{name})=> {
+            if(name==="title"){
+                setValue('slug', slugTransform(value.title, {shouldValidate: true}))
+            }
+        })
+
+        return()=> subscription.unsubscribe()
+
+    },[watch, slugTransform,setValue])
+
+
+  return (
+    <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
+            <div className="w-2/3 px-2">
+                <Input
+                    label="Title :"
+                    placeholder="Title"
+                    className="mb-4"
+                    {...register("title", { required: true })}
+                />
+                <Input
+                    label="Slug :"
+                    placeholder="Slug"
+                    className="mb-4"
+                    {...register("slug", { required: true })}
+                    onInput={(e) => {
+                        setValue("slug", slugTransform(e.currentTarget.value), { shouldValidate: true });
+                    }}
+                />
+                <RTE label="Content :" name="content" control={control} defaultValue={getValues("content")} />
+            </div>
+            <div className="w-1/3 px-2">
+                <Input
+                    label="Featured Image :"
+                    type="file"
+                    className="mb-4"
+                    accept="image/png, image/jpg, image/jpeg, image/gif"
+                    {...register("image", { required: !post })}
+                />
+                {post && (
+                    <div className="w-full mb-4">
+                        <img
+                            src={appwriteService.getFilePreview(post.featuredImage)}
+                            alt={post.title}
+                            className="rounded-lg"
+                        />
+                    </div>
+                )}
+                <Select
+                    options={["active", "inactive"]}
+                    label="Status"
+                    className="mb-4"
+                    {...register("status", { required: true })}
+                />
+                <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full">
+                    {post ? "Update" : "Submit"}
+                </Button>
+            </div>
+        </form>
+  )
+}
+
+export default PostForm
+
+>>>components/AuthLayout.jsx:
+
+import React, {useState, useEffect} from 'react'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+
+export default function Protected({children, authentication = true }) {// asuming value true
+    const navigate= useNavigate()
+    const [loader, setLoader] = useState(true)
+    const authStatus = useSelector (state=> state.auth.status)// state.name.status comes from authSlice, where auth is the name
+
+    useEffect(()=>{
+        if(authentication && authStatus !== authentication){
+            navigate("/login")
+        }else if(!authentication && authStatus !== authentication){
+            navigate("/")
+        }
+
+        setLoader(false)
+    }, [authStatus, navigate, authentication])//navigate, if user comes from navigating
+
+
+  return loader ? <h1>Loading...</h1> : <>{children}</>// if loader true Loading..., else {children} 
+}
+
+        //TODO: make it more easy to understand
+
+        // if (authStatus ===true){
+        //     navigate("/")
+        // } else if (authStatus === false) {
+        //     navigate("/login")
+        // }
+        
+        //let authValue = authStatus === true ? true : false
+
+
+>>>components/Button.jsx:
+
+import React from 'react'
+
+const Button = ({
+    children,
+    type='button',
+    bgColor='bg-blue-600',
+    textColor='text-white',
+    className='',
+    ...props
+}) => {
+  return (
+    <button className={`px-4 py-2 rounded-lg ${bgColor} ${textColor} ${className} `}  {...props}
+    >{children}</button>
+  )
+}
+
+export default Button
+
+>>>components/index.js:
+
+import Header from "./Header/Header";
+import Footer from "./Footer/Footer";
+import Container from "./container/Container";
+import Logo from "./Logo";
+import LogoutBtn from "./Header/LogoutBtn";
+import RTE from "./RTE";
+import Signup from "./Signup"
+import Login from "./Login"
+import PostForm from "./post-form/PostForm";
+import PostCard from "./PostCard"
+import AuthLayout from "./AuthLayout"
+import Button from "./Button"
+import Input from "./Input"
+import Select from "./Select"
+
+export{Header, Footer, Container, Logo, LogoutBtn, RTE, Signup, Login, PostForm, PostCard, AuthLayout, Button, Input, Select}
+
+>>>components/Input.jsx:
+
+import React, {useId, forwardRef} from 'react'
+
+const Input = forwardRef(function input({
+    label,
+    type= "text",
+    className= "",
+    ...props
+}, ref){
+    const id= useId()
+    return (
+        <div className='w-full'>
+            {label && <label 
+            className='inline-block mb-1 pl-1'
+            htmlFor= {id}// if some one clicks the label the cursor will directly go the input field for typing
+            >{label}</label>
+            }
+            <input 
+            type={type}
+            className={`px-3 py-2 rounded-lg bg-white text-black outline-none focus:bg-gray-50 duration-200 border border-gray-200 w-full ${className}`}
+            ref= {ref}
+            {...props}
+            id= {id}
+            />
+        </div>
+    )
+})
+
+export default Input
+
+// const Input = React.forwardRef( function Input({
+//     label,
+//     type = "text",
+//     className = "",
+//     ...props
+// }, ref){
+//     const id = useId()
+//     return (
+//         <div className='w-full'>
+//             {label && <label 
+//             className='inline-block mb-1 pl-1' 
+//             htmlFor={id}>
+//                 {label}
+//             </label>
+//             }
+//             <input
+//             type={type}
+//             className={`px-3 py-2 rounded-lg bg-white text-black outline-none focus:bg-gray-50 duration-200 border border-gray-200 w-full ${className}`}
+//             ref={ref}
+//             {...props}
+//             id={id}
+//             />
+//         </div>
+//     )
+// })
+
+>>>components/Login.jsx:
+
+import React, {useState} from 'react'
+import {Link,useNavigate} from 'react-router-dom'
+import {login as authLogin} from '../store/authSlice'
+import {Button, Input, Logo} from './index'
+import { useDispatch } from 'react-redux'
+import authService from '../appwrite/auth'
+import {useForm} from 'react-hook-form'
+
+const Login = () => {
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const {register, handleSubmit}= useForm()
+    const [error,setError]= useState()
+  
+    const login = async (data)=>{
+        setError("")
+        try {
+            const session = await authService.login(data)// send data to the login method of appwrite, we get a session as a responce
+            if(session){// if season exist user is loggedin
+                const userData = await authService.getCurrentUser()//getting userdata from getCurrentUser Method, not from session
+                if(userData) dispatch(authLogin(userData))// dispatch to the store
+                navigate("/")// navigate autometicaly redirects to the link, on link we have to click to navigate
+            }
+        } catch (error) {
+            setError(error.message)
+        }
+    }
+  
+    return (
+       <div className='flex items-center justify-center w-full'>
+        <div className={`mx-auto w-full max-w-lg bg-gray-100 rounded-xl p-10 border border-black/10`}>
+            <div className="mb-2 flex justify-center">
+                <span className="inline-block w-full max-w-[100px]">
+                    <Logo width="100%" />
+                </span>
+            </div>
+            <h2 className="text-center text-2xl font-bold leading-tight">Sign in to your account</h2>
+            <p className="mt-2 text-center text-base text-black/60">
+             Don&apos;t have any account?&nbsp;
+                <Link
+                    to="/signup"
+                    className="font-medium text-primary transition-all duration-200 hover:underline"
+                >
+                    Sign Up
+                </Link>
+            </p>
+            {error && <p className="text-red-600 mt-8 text-center">{error}</p>} {/* if error exists then <p></p> */}
+            <form onSubmit={handleSubmit(login)} className='mt-8'>
+                <div className='space-y-5'>
+                    <Input label="Email: " placeholder='Enter your email' type='email'
+                    {...register("email", {
+                        required: true,
+                        validate: {
+                            matchPatern: (value)=> /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value)||
+                            "Email address must be a valid address"
+                        }
+                    })}
+                    />
+                    <Input label="Password: " placeholder='Enter your password' type='password'
+                    {...register("password", {
+                        required:true,
+                        validate: {
+                            matchPatern: (value)=>/(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$"/.test(value)||
+                            "password must contain at least eight characters, at least one number and both lower and uppercase letters and special characters"
+                        } 
+                    })}
+                    />
+                    <Button type="submit" className="w-full">Sign In</Button>
+                </div>
+            </form>
+        </div>
+       </div>
+  )
+}
+
+export default Login
+
+// {...register("email", {object of options goes here})}
+// register needs to be spread, "email" is the key value of the field and should be unique eg: password etc.
+// Validate: matchPatern can be used from regexr.com// code should go within /code/.test(v)
+
+
+>>>components/Logo.jsx:
+
+import React from 'react'
+
+const Logo = ({width = '100px'}) => {
+  return (
+    <div>Logo</div>
+  )
+}
+
+export default Logo
+
+>>>components/PostCard.jsx:
+
+import React from 'react'
+import service from '../appwrite/config'
+import {Link} from 'react-router-dom'
+
+const PostCard = ({$id, title, featuredImage}) => {
+  return (
+    <Link to={`/post/${$id}`}>    {/* from here to the path we want to visit */}
+    <div className='w-full bg-gray-100 rounded-xl p-4'>
+        <div className='w-full justify-center mb-4'>
+            <img src={service.getFilePreview(featuredImage)} alt={title} className='rounded-xl' />
+        </div>
+        <h2 className='text-xl font-bold'>{title}</h2>
+    </div>
+    </Link>
+  )
+}
+
+export default PostCard
+
+>>>components/RTE.jsx:
+
+import React from 'react'
+import {Editor} from '@tinymce/tinymce-react'
+import { Controller } from 'react-hook-form'
+
+export default function RTE(name, control, label, defaultValue= '') {//control from RHF will pass state data to who ever calls this component
+
+  return (
+    <div className='w-full'>
+        {label && <label className='inline-block mb-1 pl-1'>{label}</label>}
+
+        <Controller // it will pass control to somewhere
+        name= {name || "content"}
+        control={control}
+        render={({field: {onChange}})=>(
+            <Editor
+            initialValue={defaultValue}
+            init={{
+                initialValue: defaultValue,
+                height: 500,
+                menubar: true,
+                plugins: [
+                    "image",
+                    "advlist",
+                    "autolink",
+                    "lists",
+                    "link",
+                    "image",
+                    "charmap",
+                    "preview",
+                    "anchor",
+                    "searchreplace",
+                    "visualblocks",
+                    "code",
+                    "fullscreen",
+                    "insertdatetime",
+                    "media",
+                    "table",
+                    "code",
+                    "help",
+                    "wordcount",
+                    "anchor",
+                ],
+                toolbar:
+                "undo redo | blocks | image | bold italic forecolor | alignleft aligncenter bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent |removeformat | help",
+                content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }"
+            }}
+            onEditorChange={onChange}
+            />
+        )}
+
+        />
+
+    </div>
+  )
+}
+
+>>>components/Select.jsx:
+
+import React, {useId} from 'react'
+
+const Select = ({
+    options,
+    label,
+    className,
+    ...props
+}, ref) => {
+    const id = useId()
+  return (
+    <div className='w-full'>
+        {label && <label htmlFor={id} className=''></label>}
+        <select 
+        {...props}
+        id={id}
+        ref={ref}
+        className={`px-3 py-2 rounded-lg bg-white text-black outline-none focus:bg-gray-50 duration-200 border border-gray-200 w-full ${className}`}
+        >
+            {options?.map(option => (
+                <option key={option} value={option}>
+                    {option}
+                </option>
+            ))}
+        </select>
+    </div>
+  )
+}
+
+export default React.forwardRef(Select)
+
+
+>>>components/Signup.jsx:
+
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import authService from "../appwrite/auth";
+import { login } from "../store/authSlice";
+import { useDispatch } from "react-redux";
+import { Input, Button, Logo } from "./index";
+import { useForm } from "react-hook-form";
+
+const Signup = () => {
+  const [error, setError] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { register, handleSubmit } = useForm();
+
+  const create = async (data) => {
+    setError("");
+    try {
+      const userData = await authService.createAccount(data); // data entered by the user
+      if (userData) {
+        const userData = await authService.getCurrentUser();
+        if (userData) dispatch(login(userData)); // if we get userdata dispatch the userData to login reducer
+        navigate("/");
+      }
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+  return (
+    <div className="flex items-center justify-center">
+      <div
+        className={`mx-auto w-full max-w-lg bg-gray-100 rounded-xl p-10 border border-black/10`}
+      >
+        <div className="mb-2 flex justify-center">
+          <span className="inline-block w-full max-w-[100px]">
+            <Logo width="100%" />
+          </span>
+        </div>
+        <h2 className="text-center text-2xl font-bold leading-tight">
+          Sign up to create account
+        </h2>
+        <p className="mt-2 text-center text-base text-black/60">
+          Already have an account?&nbsp;
+          <Link
+            to="/login"
+            className="font-medium text-primary transition-all duration-200 hover:underline"
+          >
+            Sign In
+          </Link>
+        </p>
+        {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
+        <form onSubmit={handleSubmit(create)}>
+          <div className="space-y-5">
+            <Input
+              label="Full Name: "
+              placeholder="Enter your full name"
+              {...register("name", { required: true })}// explain me the braces
+            />
+            <Input
+              label="Email: "
+              placeholder="Enter your email"
+              type="email"
+              {...register("email", {
+                required: true,
+                validate: {
+                  matchPatern: (value) =>
+                    /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
+                    "Email address must be a valid address",
+                },
+              })}
+            />
+            <Input
+              label="password"
+              type="password"
+              placeholder="Ener your password"
+              {...register("password", { required: true })}
+            />
+            <Button type="submit" className="w-full">Creat Account</Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default Signup;
