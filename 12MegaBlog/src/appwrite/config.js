@@ -1,5 +1,5 @@
-import { Client, ID, Databases, Storage, Query } from "appwrite";
 import conf from "../conf/conf.js";
+import { Client, ID, Databases, Storage, Query } from "appwrite";
 
 export class Service{
     client = new Client();
@@ -8,24 +8,27 @@ export class Service{
 
     constructor(){
         this.client
-            .setEndpoint(conf.apperiteURL)
-            .setProject(conf.apperiteProjectId);
+            .setEndpoint(conf.appwriteURL)
+            .setProject(conf.appwriteProjectId);
         this.databases = new Databases(this.client);
         this.bucket = new Storage(this.client)
     }
 
     async createPost({title, slug, content, featuredImage, status, userId}){
         try {
-            await this.databases.createDocument(
-                conf.apperiteDatabaseId,
-                conf.apperiteCollectionId,
+            // if (!userId) {
+            //     throw new Error("Invalid document structure: Missing required attribute 'userId'");
+            // }
+            return await this.databases.createDocument(
+                conf.appwriteDatabaseId,
+                conf.appwriteCollectionId,
                 slug,
                 {
                     title,
                     content,
                     featuredImage,
                     status,
-                    userId
+                    userId,
                 }
             )
         } catch (error) {
@@ -36,14 +39,14 @@ export class Service{
     async updatePost(slug,{title, content, featuredImage,status}){// user id will be directly provided from post
         try {
             return await this.databases.updateDocument(
-                conf.apperiteDatabaseId,
-                conf.apperiteCollectionId,
+                conf.appwriteDatabaseId,
+                conf.appwriteCollectionId,
                 slug,
                 {
                     title,
                     content,
                     featuredImage,
-                    status
+                    status,
                 }
             )
         } catch (error) {
@@ -54,8 +57,8 @@ export class Service{
     async deletePost(slug){
         try {
             await this.databases.deleteDocument(
-                conf.apperiteDatabaseId,
-                conf.apperiteCollectionId,
+                conf.appwriteDatabaseId,
+                conf.appwriteCollectionId,
                 slug
             )
             return true
@@ -68,8 +71,8 @@ export class Service{
     async getPost(slug){
         try {
             return await this.databases.getDocument(
-                conf.apperiteDatabaseId,
-                conf.apperiteCollectionId,
+                conf.appwriteDatabaseId,
+                conf.appwriteCollectionId,
                 slug
             )
         } catch (error) {
@@ -81,8 +84,8 @@ export class Service{
     async getPosts(queries = [Query.equal("status","active" )]){
         try {
             return await this.databases.listDocuments(
-                conf.apperiteDatabaseId,
-                conf.apperiteCollectionId,
+                conf.appwriteDatabaseId,
+                conf.appwriteCollectionId,
                 queries
             )
         } catch (error) {
@@ -96,7 +99,7 @@ export class Service{
     async uploadFile(file){
         try {
             return await this.bucket.createFile(
-                conf.apperiteBucketId,
+                conf.appwriteBucketId,
                 ID.unique(),
                 file
             )
@@ -109,7 +112,7 @@ export class Service{
     async deleteFile(fileId){
         try {
             await this.bucket.deleteFile(
-                conf.apperiteBucketId,
+                conf.appwriteBucketId,
                 fileId
             )
             return true
@@ -121,7 +124,7 @@ export class Service{
 
     getFilePreview(fileId){
         return this.bucket.getFilePreview(
-            conf.apperiteBucketId,
+            conf.appwriteBucketId,
             fileId
         )
     }
