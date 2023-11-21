@@ -13,12 +13,12 @@
 //         control={control}
 //         render={({field: {onChange}})=>(
 //             <Editor
-//             initialValue={defaultValue}
-//             init={{
+//             initialValue={defaultValue}//it can be the prefilled text in the editor as a string
+//             init={{// what values do you want in it, when it initializes
 //                 initialValue: defaultValue,
 //                 height: 500,
 //                 menubar: true,
-//                 plugins: [
+//                 plugins: [// must have the plugins, which we are using in toolbar
 //                     "image",
 //                     "advlist",
 //                     "autolink",
@@ -44,7 +44,7 @@
 //                 "undo redo | blocks | image | bold italic forecolor | alignleft aligncenter bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent |removeformat | help",
 //                 content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }"
 //             }}
-//             onEditorChange={onChange}
+//             onEditorChange={onChange}// if {field: {onChange}} , you need to pass the onChange in the <Editor/> component
 //             />
 //         )}
 //         />
@@ -96,7 +96,7 @@ export default function RTE({name, control, label, defaultValue =""}) {
                 "anchor",
             ],
             toolbar:
-            "undo redo | blocks | image | bold italic forecolor | alignleft aligncenter bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent |removeformat | help",
+            "undo redo | blocks | image | bold italic forecolor link | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent |removeformat | help",
             content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }"
         }}
         onEditorChange={onChange}

@@ -11,6 +11,8 @@ export default function Post() {
     const navigate = useNavigate();
 
     const userData = useSelector((state) => state.auth.userData);
+    console.log(userData);
+    console.log(post)
 
     const isAuthor = post && userData ? post.userId === userData.$id : false;
 
@@ -39,7 +41,7 @@ export default function Post() {
                     <img
                         src={appwriteService.getFilePreview(post.featuredImage)}
                         alt={post.title}
-                        className="rounded-xl"
+                        className="rounded-xl h-96"
                     />
 
                     {isAuthor && (

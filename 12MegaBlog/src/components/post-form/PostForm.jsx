@@ -5,7 +5,7 @@
     import { useNavigate } from 'react-router-dom'
     import { useSelector } from 'react-redux'
 
-    const PostForm = ({post}) => {
+    const PostForm = ({post}) => {//if existing post is there then we get the default value for editing them
         const {register, handleSubmit, watch, setValue, control, getValues} = useForm({
             defaultValues:{
                 title: post?.title|| "",
@@ -19,7 +19,7 @@
         const userData = useSelector(state=> state.auth.userData)
 
         const submit = async(data)=> {
-            if(post){//RHF accepts data frokm forms
+            if(post){//RHF accepts data from forms
                 const file = data.image[0]? appwriteService.uploadFile(data.image[0]): null // upload image // why we using data.image instead of image id?
                 
                 if(file){
@@ -45,13 +45,13 @@
         }
 
         const slugTransform = useCallback(value =>{// if else
-            if(value && typeof value=== "string"){// type of needs to be checked
+            if(value && typeof value=== "string"){// type of checked for defensive measure| 2 ensure string method is used on strings only
                 return value.trim().toLowerCase()
-                .replace(/[^a-zA-Z\d\s]+/g, "-")//
-                .replace(/\s/g, "-");//
+                .replace(/[^a-zA-Z\d\s]+/g, "-")//^ nagate used to exclude all the bracket items d-digits
+                .replace(/\s/g, "-");//only s space is converted to "-"
             }
 
-            return "";
+            return "";// serves as a fallback in case in case input "value" is not a string or is falsy
         }, [])
 
         useEffect(()=>{
@@ -74,14 +74,16 @@
                     placeholder="Title"
                     className="mb-4"
                     {...register("title", { required: true })}
+                    // ref = {register}
+                    // type= "text"
                 />
                 <Input
                     label="Slug :"
                     placeholder="Slug"
                     className="mb-4"
                     {...register("slug", { required: true })}
-                    onInput={(e) => {
-                        setValue("slug", slugTransform(e.currentTarget.value), { shouldValidate: true });
+                    onInput={(e) => {// input will come into this Input, so using onInput
+                        setValue("slug", slugTransform(e.currentTarget.value), { shouldValidate: true });// currentTarget is used while using asyncronous func inside callback, setTimeout, promices
                     }}
                 />
                 <RTE label="Content :" name="content" control={control} defaultValue={getValues("content")} />
@@ -109,7 +111,7 @@
                     className="mb-4"
                     {...register("status", { required: true })}
                 />
-                <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full">
+                <Button type="submit" bgColor={post? 'bg-green-500': undefined} className="w-full">
                     {post ? "Update" : "Submit"}
                 </Button>
             </div>

@@ -83,3 +83,56 @@ const Signup = () => {
 };
 
 export default Signup;
+
+// import React, {useState} from 'react'
+// import {Logo, Input, Button, Container} from './index'
+// import {useDispatch} from 'react-redux'
+// import { useNavigate } from 'react-router-dom'
+// import authService from '../appwrite/auth'
+// import { login } from '../store/authSlice'
+// import { useForm } from "react-hook-form"
+
+// const Signup = () => {
+//   const [error, setError] = useState("");
+//   const navigate = useNavigate();
+//   const dispatch = useDispatch();
+//   const { register, handleSubmit } = useForm();
+
+//   const signup = async (createdUserData) => {
+//     setError("");
+//     try {
+//       const userData = await authService.createAccount(createdUserData);
+//       if (userData) {
+//         const getUserData = await authService.getCurrentUser();
+//         if (getUserData) {
+//           dispatch(login(getUserData));
+//           navigate("/");
+//         }
+//       }
+//     } catch (error) {
+//       setError(error.message);
+//     }
+//   };
+//   return (
+//     <div>
+//       <Container>
+//         <Logo />
+//         <form onSubmit={handleSubmit(signup)}>
+//         <Input label = "name" type="text" placeHolder="enter your full name" className="w-full"
+//         {...register ('name', {required: true})}
+//         />
+//         <Input label = "email" type="email" placeHolder="email@example.com" className="w-full"
+//         {...register ('email', {required: true})}
+//         />
+//         <Input label = "password" type="password" placeHolder="please enter your password" className="w-full"
+//         {...register ('password', {required: true})}
+//         />
+//         <Button type='submit'className="w-full">Sign up</Button>
+//         </form>
+//         {error && <p>{error}</p>}
+//       </Container>
+//     </div>
+//   );
+// }
+
+// export default Signup
