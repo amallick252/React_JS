@@ -13,6 +13,6 @@ export const ThemeProvider = ThemeContext.Provider
 export default function useTheme(){
     return useContext(ThemeContext)
 }
-//It uses the useContext hook to consume the ThemeContext. When you call useTheme within a functional component, it will return the current context value, which includes themeMode, darkTheme, and lightTheme Also you dont need to import useContext and ThemeContext separately, you can just import useTheme instead
+//It uses the useContext hook to consume the ThemeContext. When you call useTheme within a functional component, it will return the current context value, which includes themeMode, darkTheme, and lightTheme Also you dont need to import useContext and ThemeContext separately, you can import only the useTheme instead
 
-// We are using .js file because we are not returning any jsx components
+// We are using .js file because we are not returning any jsx components. It is not compulsury to have one default export in a file and default exports are imported without {}(eg: import useTheme from './context/ThemeContext'), but named exported are imported within {}(eg: import ThemeProvider from './context/ThemeContext' )
